@@ -34,11 +34,13 @@ import play.api.test.{ FakeRequest, PlaySpecification, WithApplication }
  * Test case for the [[com.mohiva.play.silhouette.test]] helpers.
  */
 class FakesSpec extends PlaySpecification with JsonMatchers {
+  implicit val request = FakeRequest()
 
   "The `retrieve` method of the `FakeIdentityService`" should {
     "return the identity for the given login info" in {
       val loginInfo = LoginInfo("test", "test")
       val identity = FakeIdentity(loginInfo)
+      implicit val request = FakeRequest()
       val service = new FakeIdentityService[FakeIdentity](loginInfo -> identity)
 
       await(service.retrieve(loginInfo)) must beSome(identity)
@@ -46,6 +48,7 @@ class FakesSpec extends PlaySpecification with JsonMatchers {
 
     "return None if no identity could be found for the given login info" in {
       val loginInfo = LoginInfo("test", "test")
+      implicit val request = FakeRequest()
       val service = new FakeIdentityService[FakeIdentity]()
 
       await(service.retrieve(loginInfo)) must beNone

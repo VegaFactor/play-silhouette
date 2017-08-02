@@ -27,8 +27,9 @@ import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util._
 import com.mohiva.play.silhouette.impl.exceptions.{ IdentityNotFoundException, InvalidPasswordException }
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider._
-
 import scala.concurrent.{ ExecutionContext, Future }
+
+import play.api.mvc.RequestHeader
 
 /**
  * A provider for authenticating with credentials.
@@ -61,7 +62,7 @@ class CredentialsProvider @Inject() (
    * @param credentials The credentials to authenticate with.
    * @return The login info if the authentication was successful, otherwise a failure.
    */
-  def authenticate(credentials: Credentials): Future[LoginInfo] = {
+  def authenticate(credentials: Credentials)(implicit request: RequestHeader): Future[LoginInfo] = {
     loginInfo(credentials).flatMap { loginInfo =>
       authenticate(loginInfo, credentials.password).map {
         case Authenticated            => loginInfo
