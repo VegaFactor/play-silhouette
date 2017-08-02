@@ -21,7 +21,6 @@ import com.mohiva.play.silhouette.api.exceptions._
 import com.mohiva.play.silhouette.api.util._
 import com.mohiva.play.silhouette.impl.providers.PasswordProvider._
 import play.api.test.{ FakeRequest, WithApplication }
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -34,7 +33,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
     "throw ConfigurationException if unsupported hasher is stored" in new WithApplication with Context {
       val passwordInfo = PasswordInfo("unknown", "hashed(s3cr3t)")
       val loginInfo = LoginInfo(provider.id, credentials.identifier)
-      val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+      implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
       authInfoRepository.find[PasswordInfo](loginInfo) returns Future.successful(Some(passwordInfo))
 
@@ -45,7 +44,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
 
     "return None if no auth info could be found for the given credentials" in new WithApplication with Context {
       val loginInfo = new LoginInfo(provider.id, credentials.identifier)
-      val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+      implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
       authInfoRepository.find[PasswordInfo](loginInfo) returns Future.successful(None)
 
@@ -55,7 +54,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
     "return None if passwords does not match" in new WithApplication with Context {
       val passwordInfo = PasswordInfo("foo", "hashed(s3cr3t)")
       val loginInfo = LoginInfo(provider.id, credentials.identifier)
-      val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+      implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
       fooHasher.matches(passwordInfo, credentials.password) returns false
       authInfoRepository.find[PasswordInfo](loginInfo) returns Future.successful(Some(passwordInfo))
@@ -68,7 +67,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
     }
 
     "return None for wrong encoded credentials" in new WithApplication with Context {
-      val request = FakeRequest().withHeaders(AUTHORIZATION -> "wrong")
+      implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> "wrong")
 
       await(provider.authenticate(request)) must beNone
     }
@@ -76,7 +75,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
     "return login info if passwords does match" in new WithApplication with Context {
       val passwordInfo = PasswordInfo("foo", "hashed(s3cr3t)")
       val loginInfo = LoginInfo(provider.id, credentials.identifier)
-      val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+      implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
       fooHasher.matches(passwordInfo, credentials.password) returns true
       authInfoRepository.find[PasswordInfo](loginInfo) returns Future.successful(Some(passwordInfo))
@@ -88,7 +87,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
       val credentialsWithColon = Credentials("apollonia.vanova@watchmen.com", "s3c:r3t")
       val passwordInfo = PasswordInfo("foo", "hashed(s3c:r3t)")
       val loginInfo = LoginInfo(provider.id, credentialsWithColon.identifier)
-      val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentialsWithColon))
+      implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentialsWithColon))
 
       fooHasher.matches(passwordInfo, credentialsWithColon.password) returns true
       authInfoRepository.find[PasswordInfo](loginInfo) returns Future.successful(Some(passwordInfo))
@@ -99,7 +98,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
     "re-hash password with new hasher if hasher is deprecated" in new WithApplication with Context {
       val passwordInfo = PasswordInfo("bar", "hashed(s3cr3t)")
       val loginInfo = LoginInfo(provider.id, credentials.identifier)
-      val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+      implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
       fooHasher.hash(credentials.password) returns passwordInfo
       barHasher.matches(passwordInfo, credentials.password) returns true
@@ -113,7 +112,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
     "re-hash password with new hasher if password info is deprecated" in new WithApplication with Context {
       val passwordInfo = PasswordInfo("foo", "hashed(s3cr3t)")
       val loginInfo = LoginInfo(provider.id, credentials.identifier)
-      val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
+      implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> encodeCredentials(credentials))
 
       fooHasher.isDeprecated(passwordInfo) returns Some(true)
       fooHasher.hash(credentials.password) returns passwordInfo
@@ -126,7 +125,7 @@ class BasicAuthProviderSpec extends PasswordProviderSpec {
     }
 
     "return None if Authorization method is not Basic and Base64 decoded header has ':'" in new WithApplication with Context {
-      val request = FakeRequest().withHeaders(AUTHORIZATION -> Base64.encode("NotBasic foo:bar"))
+      implicit val request = FakeRequest().withHeaders(AUTHORIZATION -> Base64.encode("NotBasic foo:bar"))
 
       await(provider.authenticate(request)) must beNone
     }

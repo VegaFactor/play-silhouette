@@ -64,7 +64,7 @@ class BasicAuthProvider @Inject() (
     getCredentials(request) match {
       case Some(credentials) =>
         val loginInfo = LoginInfo(id, credentials.identifier)
-        authenticate(loginInfo, credentials.password).map {
+        authenticate(loginInfo, credentials.password)(request).map {
           case Authenticated => Some(loginInfo)
           case InvalidPassword(error) =>
             logger.debug(error)

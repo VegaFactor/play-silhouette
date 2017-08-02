@@ -30,10 +30,12 @@ import org.specs2.control.NoLanguageFeatures
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
+
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
 
 /**
  * Test case for the [[DelegableAuthInfoRepository]] trait.
@@ -217,6 +219,8 @@ class DelegableAuthInfoRepositorySpec(implicit ev: ExecutionEnv)
      * The Guice injector.
      */
     val injector = Guice.createInjector(new BaseModule)
+
+    implicit val request: RequestHeader = FakeRequest()
 
     /**
      * The auth info.

@@ -16,9 +16,10 @@
 package com.mohiva.play.silhouette.api.repositories
 
 import com.mohiva.play.silhouette.api.{ AuthInfo, LoginInfo }
-
 import scala.concurrent.Future
 import scala.reflect.ClassTag
+
+import play.api.mvc.RequestHeader
 
 /**
  * A trait that provides the means to persist authentication information for the Silhouette module.
@@ -37,7 +38,7 @@ trait AuthInfoRepository {
    * @tparam T The type of the auth info to handle.
    * @return The found auth info or None if no auth info could be found for the given login info.
    */
-  def find[T <: AuthInfo](loginInfo: LoginInfo)(implicit tag: ClassTag[T]): Future[Option[T]]
+  def find[T <: AuthInfo](loginInfo: LoginInfo)(implicit request: RequestHeader, tag: ClassTag[T]): Future[Option[T]]
 
   /**
    * Adds new auth info for the given login info.
