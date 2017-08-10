@@ -1,5 +1,7 @@
 import Dependencies._
 
+version := "4.0.1"
+
 libraryDependencies ++= Seq(
   Library.Play.cache,
   Library.Play.ws,
