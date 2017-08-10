@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+import bintray.BintrayKeys._
 import com.typesafe.sbt.SbtGhPages.GhPagesKeys._
 import com.typesafe.sbt.SbtGhPages.ghpages
 import com.typesafe.sbt.SbtGit.git
 import com.typesafe.sbt.SbtSite.SiteKeys._
 import com.typesafe.sbt.SbtSite.site
+
 import sbt.Keys._
 import sbt._
 import sbtunidoc.ScalaUnidocPlugin.autoImport._
@@ -58,10 +60,16 @@ object BasicSettings extends AutoPlugin {
   )
 
   override def projectSettings = Seq(
-    organization := "com.mohiva",
+    organization := "com.vegafactor",
     version := "7.0.1",
+    bintrayOmitLicense := true,
+    bintrayVcsUrl       := Some("https://github.com/VegaFactor/capella"),
+    bintrayOrganization := Some("vegafactor"),
+    bintrayReleaseOnPublish := true,
+    bintrayRepository   := "public-maven",
+    licenses := Seq("Apache-2.0" -> url("https://github.com/mohiva/play-silhouette/blob/master/LICENSE")),
     resolvers ++= Dependencies.resolvers,
-    scalaVersion := "2.13.1",
+    scalaVersion := "2.12.8",
     crossScalaVersions := Seq("2.13.1", "2.12.10"),
     crossVersion := CrossVersion.full,
     scalacOptions ++= {
@@ -195,41 +203,41 @@ object APIDoc {
 ////*******************************
 //// Maven settings
 ////*******************************
-object Publish extends AutoPlugin {
-
-  import xerial.sbt.Sonatype._
-
-  override def trigger = allRequirements
-
-  private val pom = {
-    <scm>
-      <url>git@github.com:mohiva/play-silhouette.git</url>
-      <connection>scm:git:git@github.com:mohiva/play-silhouette.git</connection>
-    </scm>
-      <developers>
-        <developer>
-          <id>akkie</id>
-          <name>Christian Kaps</name>
-          <url>http://mohiva.com</url>
-        </developer>
-        <developer>
-          <id>fernandoacorreia</id>
-          <name>Fernando Correia</name>
-          <url>http://www.fernandocorreia.info/</url>
-        </developer>
-      </developers>
-  }
-
-  override def projectSettings = sonatypeSettings ++ Seq(
-    description := "Authentication library for Play Framework applications that supports several authentication methods, including OAuth1, OAuth2, OpenID, CAS, Credentials, Basic Authentication, Two Factor Authentication or custom authentication schemes",
-    homepage := Some(url("http://www.silhouette.rocks/")),
-    licenses := Seq("Apache License" -> url("https://github.com/mohiva/play-silhouette/blob/master/LICENSE")),
-    publishMavenStyle := true,
-    publishArtifact in Test := false,
-    pomIncludeRepository := { _ => false },
-    pomExtra := pom
-  )
-}
+//object Publish extends AutoPlugin {
+//
+//  import xerial.sbt.Sonatype._
+//
+//  override def trigger = allRequirements
+//
+//  private val pom = {
+//    <scm>
+//      <url>git@github.com:mohiva/play-silhouette.git</url>
+//      <connection>scm:git:git@github.com:mohiva/play-silhouette.git</connection>
+//    </scm>
+//      <developers>
+//        <developer>
+//          <id>akkie</id>
+//          <name>Christian Kaps</name>
+//          <url>http://mohiva.com</url>
+//        </developer>
+//        <developer>
+//          <id>fernandoacorreia</id>
+//          <name>Fernando Correia</name>
+//          <url>http://www.fernandocorreia.info/</url>
+//        </developer>
+//      </developers>
+//  }
+//
+//  override def projectSettings = sonatypeSettings ++ Seq(
+//    description := "Authentication library for Play Framework applications that supports several authentication methods, including OAuth1, OAuth2, OpenID, CAS, Credentials, Basic Authentication, Two Factor Authentication or custom authentication schemes",
+//    homepage := Some(url("http://www.silhouette.rocks/")),
+//    licenses := Seq("Apache License" -> url("https://github.com/mohiva/play-silhouette/blob/master/LICENSE")),
+//    publishMavenStyle := true,
+//    publishArtifact in Test := false,
+//    pomIncludeRepository := { _ => false },
+//    pomExtra := pom
+//  )
+//}
 
 ////*******************************
 //// Helpers

@@ -17,7 +17,8 @@ import sbt._
 
 object Dependencies {
   val resolvers = Seq(
-    "Atlassian Releases" at "https://maven.atlassian.com/public/"
+    "Atlassian Releases" at "https://maven.atlassian.com/public/",
+    "Vega Bintray"       at "https://vegafactor.bintray.com/maven"
   )
 
   object Library {
