@@ -1,5 +1,7 @@
 import Dependencies._
 
+version := "7.0.1"
+
 libraryDependencies ++= Seq(
   Library.Play.test,
   Library.Play.specs2 % Test,
