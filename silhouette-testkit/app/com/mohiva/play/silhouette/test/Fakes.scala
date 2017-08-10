@@ -53,7 +53,7 @@ class FakeIdentityService[I <: Identity](identities: (LoginInfo, I)*) extends Id
    * @param loginInfo The login info to retrieve an identity.
    * @return The retrieved identity or None if no identity could be retrieved for the given login info.
    */
-  def retrieve(loginInfo: LoginInfo): Future[Option[I]] = {
+  def retrieve(loginInfo: LoginInfo)(implicit request: RequestHeader): Future[Option[I]] = {
     Future.successful(identities.find(_._1 == loginInfo).map(_._2))
   }
 }
