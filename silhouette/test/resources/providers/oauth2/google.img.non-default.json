@@ -15,9 +15,10 @@
     },
     {
       "metadata": {
+        "primary": true,
         "verified": true,
         "source": {
-          "type": "ACCOUNT",
+          "type": "HOME",
           "id": "109476598527568979481"
         }
       },

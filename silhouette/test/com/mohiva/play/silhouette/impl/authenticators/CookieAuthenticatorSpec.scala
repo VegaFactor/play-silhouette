@@ -288,7 +288,7 @@ class CookieAuthenticatorSpec extends PlaySpecification with Mockito with NoLang
 
   "The `init` method of the service" should {
     "[stateful] return a cookie with the authenticator ID if the authenticator could be saved in backing store" in new Context {
-      repository.add(any) returns Future.successful(authenticator)
+      repository.add(any) answers { _ => Future.successful(authenticator) }
 
       implicit val request = FakeRequest()
 
@@ -383,7 +383,7 @@ class CookieAuthenticatorSpec extends PlaySpecification with Mockito with NoLang
 
   "The `update` method of the service" should {
     "[stateful] update the authenticator in backing store" in new Context {
-      repository.update(any) returns Future.successful(authenticator)
+      repository.update(any) answers { _ => Future.successful(authenticator) }
 
       implicit val request = FakeRequest()
 
@@ -633,7 +633,8 @@ class CookieAuthenticatorSpec extends PlaySpecification with Mockito with NoLang
       path = settings.cookiePath,
       domain = settings.cookieDomain,
       secure = settings.secureCookie,
-      httpOnly = settings.httpOnlyCookie
+      httpOnly = settings.httpOnlyCookie,
+      sameSite = settings.sameSite
     )
 
     /**
@@ -646,7 +647,8 @@ class CookieAuthenticatorSpec extends PlaySpecification with Mockito with NoLang
       path = settings.cookiePath,
       domain = settings.cookieDomain,
       secure = settings.secureCookie,
-      httpOnly = settings.httpOnlyCookie
+      httpOnly = settings.httpOnlyCookie,
+      sameSite = settings.sameSite
     )
 
     /**
@@ -661,6 +663,7 @@ class CookieAuthenticatorSpec extends PlaySpecification with Mockito with NoLang
       c.domain must be equalTo settings.cookieDomain
       c.secure must be equalTo settings.secureCookie
       c.httpOnly must be equalTo settings.httpOnlyCookie
+      c.sameSite must be equalTo settings.sameSite
     }
 
     /**
@@ -675,6 +678,7 @@ class CookieAuthenticatorSpec extends PlaySpecification with Mockito with NoLang
       c.domain must be equalTo settings.cookieDomain
       c.secure must be equalTo settings.secureCookie
       c.httpOnly must be equalTo settings.httpOnlyCookie
+      c.sameSite must be equalTo settings.sameSite
     }
 
     /**

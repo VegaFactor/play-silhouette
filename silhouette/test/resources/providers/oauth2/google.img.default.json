@@ -15,9 +15,10 @@
     },
     {
       "metadata": {
+        "primary": true,
         "verified": true,
         "source": {
-          "type": "ACCOUNT",
+          "type": "HOME",
           "id": "109476598527568979481"
         }
       },
@@ -48,7 +49,8 @@
           "id": "109476598527568979481"
         }
       },
-      "url": "https://lh6.googleusercontent.com/-m34A6I77dJU/ASASAASADAAI/AVABAAAAAJk/5cg1hcjo_4s/photo.jpg?sz=50"
+      "url": "https://lh6.googleusercontent.com/-m34A6I77dJU/ASASAASADAAI/AVABAAAAAJk/5cg1hcjo_4s/photo.jpg?sz=50",
+      "default": true
     }
   ]
 }
