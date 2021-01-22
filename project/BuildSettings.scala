@@ -46,7 +46,7 @@ object BasicSettings extends AutoPlugin {
     "-Xlint:adapted-args",
     "-Xlint:inaccessible",
     "-Xlint:infer-any",
-    "-Xlint:nullary-override",
+//    "-Xlint:nullary-override",
     "-Xlint:nullary-unit"
   )
 
@@ -55,7 +55,7 @@ object BasicSettings extends AutoPlugin {
     "-deprecation",
     "-feature",
     "-encoding", "utf8",
-    "-Xfatal-warnings",
+//    "-Xfatal-warnings",
     "-Xlint"
   )
 
@@ -69,8 +69,8 @@ object BasicSettings extends AutoPlugin {
     bintrayRepository   := "public-maven",
     licenses := Seq("Apache-2.0" -> url("https://github.com/mohiva/play-silhouette/blob/master/LICENSE")),
     resolvers ++= Dependencies.resolvers,
-    scalaVersion := "2.12.8",
-    crossScalaVersions := Seq("2.13.1", "2.12.10"),
+    scalaVersion := "2.13.4",
+    crossScalaVersions := Seq("2.13.4", "2.12.10"),
     crossVersion := CrossVersion.full,
     scalacOptions ++= {
       scalacOptionsCommon ++ (scalaBinaryVersion.value match {
