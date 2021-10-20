@@ -1,6 +1,6 @@
 import Dependencies._
 
-version := "7.0.2"
+version := "7.0.3"
 
 libraryDependencies ++= Seq(
   Library.Play.test,
