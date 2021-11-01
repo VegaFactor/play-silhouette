@@ -15,6 +15,7 @@
  */
 package com.mohiva.play.silhouette.impl.providers.oauth2
 
+import com.mohiva.play.silhouette.api.Logger
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.api.util.HTTPLayer
 import com.mohiva.play.silhouette.impl.exceptions.ProfileRetrievalException
@@ -73,8 +74,10 @@ trait BaseAuth0Provider extends OAuth2Provider {
     val request = httpLayer.url(urls("api"))
     val requestWithHeader = request.withHttpHeaders(("Authorization", s"Bearer ${authInfo.accessToken}"))
 
+    logger.debug("[Silhouette][%s] Requesting userinfo from: %s".format(id, request))
     val httpResponse = requestWithHeader.get()
     httpResponse.flatMap { response =>
+      logger.debug("[Silhouette][%s] Received userinfo from: %s -- %s".format(id, request, response))
       response.status match {
         case Http.Status.OK =>
           profileParser.parse(response.json, authInfo)
@@ -111,7 +114,7 @@ trait BaseAuth0Provider extends OAuth2Provider {
 /**
  * The profile parser for the common social profile.
  */
-class Auth0ProfileParser extends SocialProfileParser[JsValue, CommonSocialProfile, OAuth2Info] {
+class Auth0ProfileParser extends SocialProfileParser[JsValue, CommonSocialProfile, OAuth2Info] with Logger {
 
   /**
    * Parses the social profile.
@@ -120,16 +123,16 @@ class Auth0ProfileParser extends SocialProfileParser[JsValue, CommonSocialProfil
    * @return The social profile from given result.
    */
   override def parse(json: JsValue, authInfo: OAuth2Info): Future[CommonSocialProfile] = Future.successful {
-    val userID = (json \ "sub").as[String]
-    val fullName = (json \ "name").asOpt[String]
+    logger.debug("[Silhouette][Auth0ProfileParser] parsing: %s ( %s )".format(json, authInfo))
+    val userID    = (json \ "sub").as[String]
+    val fullName  = (json \ "name").asOpt[String]
     val avatarURL = (json \ "picture").asOpt[String]
-    val email = (json \ "email").asOpt[String]
+    val email     = (json \ "email").asOpt[String]
 
-    CommonSocialProfile(
-      loginInfo = LoginInfo(ID, userID),
-      fullName = fullName,
-      avatarURL = avatarURL,
-      email = email)
+    CommonSocialProfile(loginInfo = LoginInfo(ID, userID),
+                        fullName  = fullName,
+                        avatarURL = avatarURL,
+                        email     = email)
   }
 }
 

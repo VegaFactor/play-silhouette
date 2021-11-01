@@ -60,7 +60,9 @@ trait OpenIDProvider extends SocialProvider with OpenIDConstants with Logger {
       case None =>
         // Either we get the openID from request or we use the provider ID to retrieve the redirect URL
         val openID = request.extractString(OpenID).getOrElse(settings.providerURL)
-        service.redirectURL(openID, resolveCallbackURL(settings.callbackURL)).map { url =>
+        val callbackURL = resolveCallbackURL(settings.callbackURL)
+        logger.debug("[Silhouette][%s] Identifying Redirection for: %s - %s".format(id, openID, callbackURL))
+        service.redirectURL(openID, callbackURL).map { url =>
           val redirect = Results.Redirect(url)
           logger.debug("[Silhouette][%s] Redirecting to: %s".format(id, url))
           Left(redirect)

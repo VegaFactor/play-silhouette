@@ -63,6 +63,9 @@ val silhouetteTestkit = Project(
 ).dependsOn(silhouette)
   .settings(commonSettings: _*)
 
+publishConfiguration := publishConfiguration.value.withOverwrite(true)
+publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
+
 val root =
   project.in(file("."))
     .enablePlugins(ScalaUnidocPlugin)
