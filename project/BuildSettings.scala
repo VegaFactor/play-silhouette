@@ -61,7 +61,7 @@ object BasicSettings extends AutoPlugin {
 
   override def projectSettings = Seq(
     organization := "com.vegafactor",
-    version := "7.0.3",
+    version := "7.0.4",
     githubOwner       := "VegaFactor",
     githubRepository  := "play-silhouette",
     githubTokenSource := TokenSource.Environment("GITHUB_TOKEN") || TokenSource.GitConfig("github.token"),
