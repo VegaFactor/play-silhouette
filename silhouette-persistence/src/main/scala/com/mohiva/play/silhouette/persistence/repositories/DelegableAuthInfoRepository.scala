@@ -20,9 +20,10 @@ import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.{ AuthInfo, LoginInfo }
 import com.mohiva.play.silhouette.persistence.daos.{ AuthInfoDAO, DelegableAuthInfoDAO }
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository._
-
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.reflect.ClassTag
+
+import play.api.mvc.RequestHeader
 
 /**
  * An implementation of the auth info repository which delegates the storage of an auth info instance to its
@@ -47,7 +48,7 @@ class DelegableAuthInfoRepository(daos: DelegableAuthInfoDAO[_]*)(implicit ec: E
    * @tparam T The type of the auth info to handle.
    * @return The found auth info or None if no auth info could be found for the given login info.
    */
-  override def find[T <: AuthInfo](loginInfo: LoginInfo)(implicit tag: ClassTag[T]): Future[Option[T]] = {
+  override def find[T <: AuthInfo](loginInfo: LoginInfo)(implicit request: RequestHeader, tag: ClassTag[T]): Future[Option[T]] = {
     daos.find(_.classTag == tag) match {
       case Some(dao) => dao.find(loginInfo).map(_.map(_.asInstanceOf[T]))
       case _         => throw new ConfigurationException(FindError.format(tag.runtimeClass))
@@ -62,7 +63,7 @@ class DelegableAuthInfoRepository(daos: DelegableAuthInfoDAO[_]*)(implicit ec: E
    * @tparam T The type of the auth info to handle.
    * @return The saved auth info.
    */
-  override def add[T <: AuthInfo](loginInfo: LoginInfo, authInfo: T): Future[T] = {
+  override def add[T <: AuthInfo](loginInfo: LoginInfo, authInfo: T)(implicit request: RequestHeader): Future[T] = {
     daos.find(_.classTag.runtimeClass == authInfo.getClass) match {
       case Some(dao) => dao.asInstanceOf[AuthInfoDAO[T]].add(loginInfo, authInfo)
       case _         => throw new ConfigurationException(AddError.format(authInfo.getClass))
@@ -77,7 +78,7 @@ class DelegableAuthInfoRepository(daos: DelegableAuthInfoDAO[_]*)(implicit ec: E
    * @tparam T The type of the auth info to handle.
    * @return The updated auth info.
    */
-  override def update[T <: AuthInfo](loginInfo: LoginInfo, authInfo: T): Future[T] = {
+  override def update[T <: AuthInfo](loginInfo: LoginInfo, authInfo: T)(implicit request: RequestHeader): Future[T] = {
     daos.find(_.classTag.runtimeClass == authInfo.getClass) match {
       case Some(dao) => dao.asInstanceOf[AuthInfoDAO[T]].update(loginInfo, authInfo)
       case _         => throw new ConfigurationException(UpdateError.format(authInfo.getClass))
@@ -94,7 +95,7 @@ class DelegableAuthInfoRepository(daos: DelegableAuthInfoDAO[_]*)(implicit ec: E
    * @tparam T The type of the auth info to handle.
    * @return The updated auth info.
    */
-  override def save[T <: AuthInfo](loginInfo: LoginInfo, authInfo: T): Future[T] = {
+  override def save[T <: AuthInfo](loginInfo: LoginInfo, authInfo: T)(implicit request: RequestHeader): Future[T] = {
     daos.find(_.classTag.runtimeClass == authInfo.getClass) match {
       case Some(dao) => dao.asInstanceOf[AuthInfoDAO[T]].save(loginInfo, authInfo)
       case _         => throw new ConfigurationException(SaveError.format(authInfo.getClass))
@@ -109,7 +110,7 @@ class DelegableAuthInfoRepository(daos: DelegableAuthInfoDAO[_]*)(implicit ec: E
    * @tparam T The type of the auth info to handle.
    * @return A future to wait for the process to be completed.
    */
-  override def remove[T <: AuthInfo](loginInfo: LoginInfo)(implicit tag: ClassTag[T]): Future[Unit] = {
+  override def remove[T <: AuthInfo](loginInfo: LoginInfo)(implicit request: RequestHeader, tag: ClassTag[T]): Future[Unit] = {
     daos.find(_.classTag == tag) match {
       case Some(dao) => dao.remove(loginInfo)
       case _         => throw new ConfigurationException(RemoveError.format(tag.runtimeClass))

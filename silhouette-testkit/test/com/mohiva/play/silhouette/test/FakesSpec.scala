@@ -39,6 +39,7 @@ class FakesSpec extends PlaySpecification with JsonMatchers {
     "return the identity for the given login info" in {
       val loginInfo = LoginInfo("test", "test")
       val identity = FakeIdentity(loginInfo)
+      implicit val request = FakeRequest()
       val service = new FakeIdentityService[FakeIdentity](loginInfo -> identity)
 
       await(service.retrieve(loginInfo)) must beSome(identity)
@@ -46,6 +47,7 @@ class FakesSpec extends PlaySpecification with JsonMatchers {
 
     "return None if no identity could be found for the given login info" in {
       val loginInfo = LoginInfo("test", "test")
+      implicit val request = FakeRequest()
       val service = new FakeIdentityService[FakeIdentity]()
 
       await(service.retrieve(loginInfo)) must beNone
@@ -294,7 +296,7 @@ class FakesSpec extends PlaySpecification with JsonMatchers {
      * The guice module.
      */
     class GuiceModule extends ScalaModule {
-      def configure(): Unit = {
+      override def configure(): Unit = {
         bind[Silhouette[CookieEnv]].to[SilhouetteProvider[CookieEnv]]
         bind[Environment[CookieEnv]].toInstance(env)
         bind[SecuredController]

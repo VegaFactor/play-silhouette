@@ -30,10 +30,12 @@ import org.specs2.control.NoLanguageFeatures
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
+
+import play.api.mvc.Request
+import play.api.test.FakeRequest
 
 /**
  * Test case for the [[DelegableAuthInfoRepository]] trait.
@@ -232,6 +234,8 @@ class DelegableAuthInfoRepositorySpec(implicit ev: ExecutionEnv)
     lazy val oauth1InfoDAO = spy(new OAuth1InfoDAO)
     lazy val oauth2InfoDAO = spy(new OAuth2InfoDAO)
 
+    implicit val request: Request[_] = FakeRequest()
+
     /**
      * The cache instance to store the different auth information instances.
      */
@@ -254,7 +258,7 @@ class DelegableAuthInfoRepositorySpec(implicit ev: ExecutionEnv)
       /**
        * Configures the module.
        */
-      def configure() {
+      override def configure(): Unit = {
         bind[DelegableAuthInfoDAO[PasswordInfo]].toInstance(passwordInfoDAO)
         bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(oauth1InfoDAO)
         bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(oauth2InfoDAO)

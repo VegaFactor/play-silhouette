@@ -194,7 +194,7 @@ class UnsecuredActionSpec extends PlaySpecification with Mockito with JsonMatche
      * The guice module.
      */
     class GuiceModule extends ScalaModule {
-      def configure(): Unit = {
+      override def configure(): Unit = {
         bind[Environment[UnsecuredEnv]].toInstance(env)
         bind[Silhouette[UnsecuredEnv]].to[SilhouetteProvider[UnsecuredEnv]]
         bind[UnsecuredController]
@@ -367,7 +367,7 @@ object UnsecuredActionSpec {
      *
      * @return The result to send to the client.
      */
-    def defaultAction = silhouette.UnsecuredAction { implicit request =>
+    def defaultAction = silhouette.UnsecuredAction {
       Ok("full.access")
     }
 

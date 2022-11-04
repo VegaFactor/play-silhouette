@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-import com.typesafe.sbt.SbtGhPages.GhPagesKeys._
-import com.typesafe.sbt.SbtGhPages.ghpages
-import com.typesafe.sbt.SbtGit.git
-import com.typesafe.sbt.SbtSite.SiteKeys._
-import com.typesafe.sbt.SbtSite.site
+//import com.typesafe.sbt.SbtGhPages.GhPagesKeys._
+//import com.typesafe.sbt.SbtGhPages.ghpages
+//import com.typesafe.sbt.SbtGit.git
+//import com.typesafe.sbt.SbtSite.SiteKeys._
+//import com.typesafe.sbt.SbtSite.site
+
 import sbt.Keys._
 import sbt._
-import sbtunidoc.Plugin._
+import sbtunidoc.ScalaUnidocPlugin.autoImport._
+import sbtghpackages.GitHubPackagesPlugin.autoImport._
+
 
 ////*******************************
 //// Basic settings
@@ -29,25 +32,51 @@ import sbtunidoc.Plugin._
 object BasicSettings extends AutoPlugin {
   override def trigger = allRequirements
 
+  val `scalacOptions2.12.x` = Seq(
+    "-Xlint:adapted-args",
+    "-Ywarn-inaccessible",
+    "-Ywarn-infer-any",
+    "-Xlint:nullary-override",
+    "-Xlint:nullary-unit",
+    "-Xmax-classfile-name", "254",
+    "-language:higherKinds"
+  )
+
+  val `scalacOptions2.13.x` = Seq(
+    "-Xlint:adapted-args",
+    "-Xlint:inaccessible",
+    "-Xlint:infer-any",
+//    "-Xlint:nullary-override",
+    "-Xlint:nullary-unit"
+  )
+
+  val scalacOptionsCommon = Seq(
+    "-unchecked",
+    "-deprecation",
+    "-feature",
+    "-encoding", "utf8",
+//    "-Xfatal-warnings",
+    "-Xlint"
+  )
+
   override def projectSettings = Seq(
-    organization := "com.mohiva",
-    version := "5.0.0-RC3",
+    organization := "com.vegafactor",
+    version := "7.0.2",
+    githubOwner       := "VegaFactor",
+    githubRepository  := "play-silhouette",
+    githubTokenSource := TokenSource.Environment("GITHUB_TOKEN") || TokenSource.GitConfig("github.token"),
+    licenses := Seq("Apache-2.0" -> url("https://github.com/mohiva/play-silhouette/blob/master/LICENSE")),
     resolvers ++= Dependencies.resolvers,
-    scalaVersion := Dependencies.Versions.scalaVersion,
-    crossScalaVersions := Dependencies.Versions.crossScala,
-    scalacOptions ++= Seq(
-      "-deprecation", // Emit warning and location for usages of deprecated APIs.
-      "-feature", // Emit warning and location for usages of features that should be imported explicitly.
-      "-unchecked", // Enable additional warnings where generated code depends on assumptions.
-      "-Xfatal-warnings", // Fail the compilation if there are any warnings.
-      "-Xlint", // Enable recommended additional warnings.
-      "-Ywarn-adapted-args", // Warn if an argument list is modified to match the receiver.
-      "-Ywarn-dead-code", // Warn when dead code is identified.
-      "-Ywarn-inaccessible", // Warn about inaccessible types in method signatures.
-      "-Ywarn-nullary-override", // Warn when non-nullary overrides nullary, e.g. def foo() over def foo.
-      "-Ywarn-numeric-widen" // Warn when numerics are widened.
-    ),
-    scalacOptions in Test ~= { (options: Seq[String]) =>
+    scalaVersion := "2.13.4",
+//    crossScalaVersions := Seq("2.13.4", "2.12.10"),
+//    crossVersion := CrossVersion.full,
+    scalacOptions ++= {
+      scalacOptionsCommon ++ (scalaBinaryVersion.value match {
+        case "2.12" => `scalacOptions2.12.x`
+        case "2.13" => `scalacOptions2.13.x`
+      })
+    },
+    scalacOptions in Test ~= { options: Seq[String] =>
       options filterNot (_ == "-Ywarn-dead-code") // Allow dead code in tests (to support using mockito).
     },
     parallelExecution in Test := false,
@@ -63,40 +92,40 @@ object BasicSettings extends AutoPlugin {
 ////*******************************
 //// Scalariform settings
 ////*******************************
-object CodeFormatter extends AutoPlugin {
-
-  import com.typesafe.sbt.SbtScalariform._
-
-  import scalariform.formatter.preferences._
-
-  lazy val BuildConfig = config("build") extend Compile
-  lazy val BuildSbtConfig = config("buildsbt") extend Compile
-
-  lazy val prefs = Seq(
-    ScalariformKeys.preferences := ScalariformKeys.preferences.value
-      .setPreference(FormatXml, false)
-      .setPreference(DoubleIndentClassDeclaration, false)
-      .setPreference(AlignSingleLineCaseStatements, true)
-      .setPreference(DanglingCloseParenthesis, Preserve)
-  )
-
-  override def trigger = allRequirements
-
-  override def projectSettings = defaultScalariformSettings ++ prefs ++
-    inConfig(BuildConfig)(configScalariformSettings) ++
-    inConfig(BuildSbtConfig)(configScalariformSettings) ++
-    Seq(
-      scalaSource in BuildConfig := baseDirectory.value / "project",
-      scalaSource in BuildSbtConfig := baseDirectory.value / "project",
-      includeFilter in (BuildConfig, ScalariformKeys.format) := ("*.scala": FileFilter),
-      includeFilter in (BuildSbtConfig, ScalariformKeys.format) := ("*.sbt": FileFilter),
-      ScalariformKeys.format in Compile := {
-        (ScalariformKeys.format in BuildSbtConfig).value
-        (ScalariformKeys.format in BuildConfig).value
-        (ScalariformKeys.format in Compile).value
-      }
-    )
-}
+//object CodeFormatter extends AutoPlugin {
+//
+//  import com.typesafe.sbt.SbtScalariform._
+//
+//  import scalariform.formatter.preferences._
+//
+//  lazy val BuildConfig = config("build") extend Compile
+//  lazy val BuildSbtConfig = config("buildsbt") extend Compile
+//
+//  lazy val prefs = Seq(
+//    ScalariformKeys.preferences := ScalariformKeys.preferences.value
+//      .setPreference(FormatXml, false)
+//      .setPreference(DoubleIndentClassDeclaration, false)
+//      .setPreference(AlignSingleLineCaseStatements, true)
+//      .setPreference(DanglingCloseParenthesis, Preserve)
+//  )
+//
+//  override def trigger = allRequirements
+//
+//  override def projectSettings = defaultScalariformSettings ++ prefs ++
+//    inConfig(BuildConfig)(configScalariformSettings) ++
+//    inConfig(BuildSbtConfig)(configScalariformSettings) ++
+//    Seq(
+//      scalaSource in BuildConfig := baseDirectory.value / "project",
+//      scalaSource in BuildSbtConfig := baseDirectory.value / "project",
+//      includeFilter in (BuildConfig, ScalariformKeys.format) := ("*.scala": FileFilter),
+//      includeFilter in (BuildSbtConfig, ScalariformKeys.format) := ("*.sbt": FileFilter),
+//      ScalariformKeys.format in Compile := {
+//        (ScalariformKeys.format in BuildSbtConfig).value
+//        (ScalariformKeys.format in BuildConfig).value
+//        (ScalariformKeys.format in Compile).value
+//      }
+//    )
+//}
 
 ////*******************************
 //// ScalaDoc settings
@@ -141,69 +170,81 @@ object Doc extends AutoPlugin {
 //// APIDoc settings
 ////*******************************
 // @see https://github.com/paypal/horizon/blob/develop/src/main/scala/com/paypal/horizon/BuildUtilities.scala
-object APIDoc {
-
-  lazy val files = Seq(file("CNAME"))
-
-  lazy val settings = unidocSettings ++
-    site.settings ++
-    ghpages.settings ++
-    Seq(
-      // Create version
-      siteMappings ++= {
-        val mapping = (mappings in (ScalaUnidoc, packageDoc)).value
-        val ver = version.value
-        for ((file, path) <- mapping) yield (file, s"$ver/$path")
-      },
-      // Add custom files from site directory
-      siteMappings ++= baseDirectory.map { dir =>
-        for (file <- files) yield (new File(dir.getAbsolutePath + "/site/" + file), file.name)
-      }.value,
-      // Do not delete old versions
-      synchLocal := {
-        val betterMappings = privateMappings.value.map { case (file, tgt) => (file, updatedRepository.value / tgt) }
-        IO.copy(betterMappings)
-        updatedRepository.value
-      },
-      git.remoteRepo := "git@github.com:mohiva/play-silhouette.git"
-    )
-}
+//object APIDoc {
+//
+//  lazy val files = Seq(file("CNAME"))
+//
+//  lazy val settings =
+//    site.settings ++
+//    ghpages.settings ++
+//    Seq(
+//      // Create version
+//      siteMappings ++= {
+//        val mapping = (mappings in (ScalaUnidoc, packageDoc)).value
+//        val ver = version.value
+//        for ((file, path) <- mapping) yield (file, s"$ver/$path")
+//      },
+//      // Add custom files from site directory
+//      siteMappings ++= baseDirectory.map { dir =>
+//        for (file <- files) yield (new File(dir.getAbsolutePath + "/site/" + file), file.name)
+//      }.value,
+//      // Do not delete old versions
+//      synchLocal := {
+//        val betterMappings = privateMappings.value.map { case (file, tgt) => (file, updatedRepository.value / tgt) }
+//        IO.copy(betterMappings)
+//        updatedRepository.value
+//      },
+//      git.remoteRepo := "git@github.com:mohiva/play-silhouette.git"
+//    )
+//}
 
 ////*******************************
 //// Maven settings
 ////*******************************
-object Publish extends AutoPlugin {
+//object Publish extends AutoPlugin {
+//
+//  import xerial.sbt.Sonatype._
+//
+//  override def trigger = allRequirements
+//
+//  private val pom = {
+//    <scm>
+//      <url>git@github.com:mohiva/play-silhouette.git</url>
+//      <connection>scm:git:git@github.com:mohiva/play-silhouette.git</connection>
+//    </scm>
+//      <developers>
+//        <developer>
+//          <id>akkie</id>
+//          <name>Christian Kaps</name>
+//          <url>http://mohiva.com</url>
+//        </developer>
+//        <developer>
+//          <id>fernandoacorreia</id>
+//          <name>Fernando Correia</name>
+//          <url>http://www.fernandocorreia.info/</url>
+//        </developer>
+//      </developers>
+//  }
+//
+//  override def projectSettings = sonatypeSettings ++ Seq(
+//    description := "Authentication library for Play Framework applications that supports several authentication methods, including OAuth1, OAuth2, OpenID, CAS, Credentials, Basic Authentication, Two Factor Authentication or custom authentication schemes",
+//    homepage := Some(url("http://www.silhouette.rocks/")),
+//    licenses := Seq("Apache License" -> url("https://github.com/mohiva/play-silhouette/blob/master/LICENSE")),
+//    publishMavenStyle := true,
+//    publishArtifact in Test := false,
+//    pomIncludeRepository := { _ => false },
+//    pomExtra := pom
+//  )
+//}
 
-  import xerial.sbt.Sonatype._
-
-  override def trigger = allRequirements
-
-  private val pom = {
-    <scm>
-      <url>git@github.com:mohiva/play-silhouette.git</url>
-      <connection>scm:git:git@github.com:mohiva/play-silhouette.git</connection>
-    </scm>
-      <developers>
-        <developer>
-          <id>akkie</id>
-          <name>Christian Kaps</name>
-          <url>http://mohiva.com</url>
-        </developer>
-        <developer>
-          <id>fernandoacorreia</id>
-          <name>Fernando Correia</name>
-          <url>http://www.fernandocorreia.info/</url>
-        </developer>
-      </developers>
-  }
-
-  override def projectSettings = sonatypeSettings ++ Seq(
-    description := "Authentication library for Play Framework applications that supports several authentication methods, including OAuth1, OAuth2, OpenID, CAS, Credentials, Basic Authentication, Two Factor Authentication or custom authentication schemes",
-    homepage := Some(url("http://www.silhouette.rocks/")),
-    licenses := Seq("Apache License" -> url("https://github.com/mohiva/play-silhouette/blob/master/LICENSE")),
-    publishMavenStyle := true,
-    publishArtifact in Test := false,
-    pomIncludeRepository := { _ => false },
-    pomExtra := pom
-  )
+////*******************************
+//// Helpers
+////*******************************
+object Util {
+  def priorTo213(scalaVersion: String): Boolean =
+    CrossVersion.partialVersion(scalaVersion) match {
+      case Some((2, minor)) if minor < 13 => true
+      case _                              => false
+    }
 }
+

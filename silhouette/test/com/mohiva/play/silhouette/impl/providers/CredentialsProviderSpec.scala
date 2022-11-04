@@ -21,9 +21,11 @@ import com.mohiva.play.silhouette.api.util.{ Credentials, PasswordInfo }
 import com.mohiva.play.silhouette.impl.exceptions.{ IdentityNotFoundException, InvalidPasswordException }
 import com.mohiva.play.silhouette.impl.providers.PasswordProvider._
 import play.api.test.WithApplication
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+
+import play.api.mvc.Request
+import play.api.test.FakeRequest
 
 /**
  * Test case for the [[com.mohiva.play.silhouette.impl.providers.CredentialsProvider]] class.
@@ -41,7 +43,7 @@ class CredentialsProviderSpec extends PasswordProviderSpec {
       }
     }
 
-    "throw InvalidPasswordException if passwords does not match" in new WithApplication with Context {
+    "throw InvalidPasswordException if password does not match" in new WithApplication with Context {
       val passwordInfo = PasswordInfo("foo", "hashed(s3cr3t)")
       val loginInfo = LoginInfo(provider.id, credentials.identifier)
 
@@ -106,6 +108,11 @@ class CredentialsProviderSpec extends PasswordProviderSpec {
    * The context.
    */
   trait Context extends BaseContext {
+
+    /**
+     * The implicit request.
+     */
+    implicit val request: Request[_] = FakeRequest()
 
     /**
      * The test credentials.
